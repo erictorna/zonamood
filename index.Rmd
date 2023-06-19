@@ -9,3 +9,17 @@ output:
 
 * Descriptives[[html]](descriptives.html)
 
+```{r, echo=FALSE, include=FALSE}
+library(data.table)
+library(kableExtra)
+library(dplyr)
+load('~/idiap/projects/zonamood/alumnes_avaluar.RData')
+setDT(alumnes_avaluar)
+alumnes = alumnes_avaluar[avaluar==1] %>% select(-avaluar)
+```
+
+* Alumnes que presenten almenys la màxima puntuació en alguna de les preguntes centinella o <br> tenen pregntes centinella alterades + una puntuació d'almenys 'lleu' a qualsevol esfera
+
+```{r, echo=FALSE}
+kable_styling(kable(alumnes))
+```

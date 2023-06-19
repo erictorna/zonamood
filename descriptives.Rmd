@@ -6,7 +6,6 @@ output:
   html_document:
     toc: yes
     toc_float: yes
-    css: styles.css
   pdf_document:
     toc: yes
     
@@ -184,7 +183,8 @@ social = social %>% select(-suma, -resultat)
 
 tables <- list(data, benestar_emocional, emocional, familiar, relacional_escolar, social)
 esferes <- Reduce(left_join, tables)
-esferes = esferes %>% mutate(risc = ifelse(resultat_tot!='sense risc' | resultat_benestar!='sense risc' | resultat_emocional!='sense risc' | resultat_familiar!='sense risc' | resultat_escolar!='sense risc' | resultat_social!='sense risc' | sol>=3 | social>=3 | no_grup_amics>=2 | casa_bien>=3 | actuar_davant_abus>=3, 'risc', 'no_risc'))
+esferes = esferes %>% mutate(risc = ifelse(resultat_tot!='sense risc' | resultat_benestar!='sense risc' | resultat_emocional!='sense risc' | resultat_familiar!='sense risc' | resultat_escolar!='sense risc' | resultat_social!='sense risc' | sol>=3 | social>=3 | no_grup_amics>=3 | casa_bien>=3 | actuar_davant_abus>=3, 'risc', 'no_risc'))
+save(esferes, file='~/idiap/projects/zonamood/esferes.RData')
 ```
 
 ```{r histo_esferes, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
@@ -251,7 +251,7 @@ p_valor = chi_square_result$p.value
 
 # Gràfica preguntes
 
-```{r histogrames_variables, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+```{r histogrames_variables, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.width=10, fig.height=5}
 numerical_vars <- names(data)[sapply(data, is.numeric)]
 sums <- colSums(data[, ..numerical_vars])
 
@@ -262,14 +262,14 @@ sum_df <- data.frame(variable = names(sums), sum = sums)
 sum_df$variable <- factor(sum_df$variable, levels = names(data))
 
 # Create a new column for color groups
-sum_df$color_group <- cut(
+sum_df$esfera <- cut(
   as.numeric(sum_df$variable),
   breaks = c(0, 12, 24, 33, 39, Inf),
   labels = c("Benestar emocional", "emocional", "social", "familiar", "escolar")
 )
 
 # Create a bar plot with different colors for each group
-plot <- ggplot(sum_df, aes(x = variable, y = sum, fill = color_group)) +
+plot <- ggplot(sum_df, aes(x = variable, y = sum, fill = esfera)) +
   geom_bar(stat = "identity") +
   labs(title = "Total Sum of Variables", x = "Variables", y = "Sum") +
   theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
@@ -288,20 +288,18 @@ plot
 ```{r hostogrames_variables_genere, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.width=10, fig.height=5}
 males = data[SEXE=='Masculí']
 females = data[SEXE=='Femení']
-# Set up the plotting area with two columns
-par(mfrow = c(1, 2))
 
 # Plot the first histogram with normal distribution
 numerical_vars <- names(males)[sapply(males, is.numeric)]
 sums <- colSums(males[, ..numerical_vars])
 sum_df <- data.frame(variable = names(sums), sum = sums)
 sum_df$variable <- factor(sum_df$variable, levels = names(data))
-sum_df$color_group <- cut(
+sum_df$esfera <- cut(
   as.numeric(sum_df$variable),
   breaks = c(0, 12, 24, 33, 39, Inf),
   labels = c("Benestar emocional", "emocional", "social", "familiar", "escolar")
 )
-ggplot(sum_df, aes(x = variable, y = sum, fill = color_group)) +
+ggplot(sum_df, aes(x = variable, y = sum, fill = esfera)) +
   geom_bar(stat = "identity") +
   labs(title = "Homes", x = "Variables", y = "Sum") +
   theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
@@ -316,12 +314,12 @@ numerical_vars <- names(females)[sapply(females, is.numeric)]
 sums <- colSums(females[, ..numerical_vars])
 sum_df <- data.frame(variable = names(sums), sum = sums)
 sum_df$variable <- factor(sum_df$variable, levels = names(data))
-sum_df$color_group <- cut(
+sum_df$esfera <- cut(
   as.numeric(sum_df$variable),
   breaks = c(0, 12, 24, 33, 39, Inf),
   labels = c("Benestar emocional", "emocional", "social", "familiar", "escolar")
 )
-ggplot(sum_df, aes(x = variable, y = sum, fill = color_group)) +
+ggplot(sum_df, aes(x = variable, y = sum, fill = esfera)) +
   geom_bar(stat = "identity") +
   labs(title = "Dones", x = "Variables", y = "Sum") +
   theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
@@ -333,7 +331,7 @@ ggplot(sum_df, aes(x = variable, y = sum, fill = color_group)) +
 
 ```
 
-* Les següents variables presenten diferències significatives entre sexes segond chi-squared test:
+* Les següents variables presenten diferències significatives entre sexes segons chi-squared test:
 
 ```{r chi-test_sexe}
 count_table <- data %>% select(-CODI, -resultat_tot)
@@ -364,20 +362,18 @@ print(significant_vars)
 data = esferes %>% select(-CODI, -SEXE, -resultat_tot, -resultat_benestar, -resultat_emocional, -resultat_familiar, -resultat_escolar, -resultat_social, -risc)
 calella = data[cole=='Calella']
 gregori = esferes[cole=='St.Gregori']
-# Set up the plotting area with two columns
-par(mfrow = c(1, 2))
 
 # Plot the first histogram with normal distribution
 numerical_vars <- names(calella)[sapply(calella, is.numeric)]
 sums <- colSums(calella[, ..numerical_vars])
 sum_df <- data.frame(variable = names(sums), sum = sums)
 sum_df$variable <- factor(sum_df$variable, levels = names(data))
-sum_df$color_group <- cut(
+sum_df$esfera <- cut(
   as.numeric(sum_df$variable),
   breaks = c(0, 10, 22, 31, 37, Inf),
   labels = c("Benestar emocional", "emocional", "social", "familiar", "escolar")
 )
-ggplot(sum_df, aes(x = variable, y = sum, fill = color_group)) +
+ggplot(sum_df, aes(x = variable, y = sum, fill = esfera)) +
   geom_bar(stat = "identity") +
   labs(title = "Calella", x = "Variables", y = "Sum") +
   theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
@@ -392,12 +388,12 @@ numerical_vars <- names(gregori)[sapply(gregori, is.numeric)]
 sums <- colSums(gregori[, ..numerical_vars])
 sum_df <- data.frame(variable = names(sums), sum = sums)
 sum_df$variable <- factor(sum_df$variable, levels = names(data))
-sum_df$color_group <- cut(
+sum_df$esfera <- cut(
   as.numeric(sum_df$variable),
   breaks = c(0, 10, 22, 31, 37, Inf),
   labels = c("Benestar emocional", "emocional", "social", "familiar", "escolar")
 )
-ggplot(sum_df, aes(x = variable, y = sum, fill = color_group)) +
+ggplot(sum_df, aes(x = variable, y = sum, fill = esfera)) +
   geom_bar(stat = "identity") +
   labs(title = "St.Gregori", x = "Variables", y = "Sum") +
   theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
@@ -409,7 +405,7 @@ ggplot(sum_df, aes(x = variable, y = sum, fill = color_group)) +
 
 ```
 
-* Les següents variables presenten diferències significatives entre sexes segond chi-squared test:
+* Les següents variables presenten diferències significatives entre col·legis segons chi-squared test:
 
 ```{r chi-test_cole}
 count_table <- data 
