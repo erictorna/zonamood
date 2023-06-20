@@ -4,6 +4,8 @@ library(ggplot2)
 library(readxl)
 library(data.table)
 data = read_excel('~/idiap/data/zonamood/results-survey26.04.2023_DEFINITIU.xlsx', sheet = 15, col_names = TRUE)
+# Canviem els valors de 'valorat' ja que hi ha un error en en l'excel i estan les dades al revés
+data = data %>% mutate(valorat=ifelse(valorat==2, 0, 2))
 setDT(data)
 benestar_emocional = data %>% select(1:10)
 emocional = data %>% select(1,2,11:19)
