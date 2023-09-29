@@ -1,0 +1,709 @@
+---
+title: "Comparativa"
+author: "ETN"
+date: "`r Sys.time()`"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+```{r libraries, include = FALSE}
+library(data.table)
+library(readxl)
+library(tidyverse)
+library(kableExtra)
+library(scales)
+load('/home/idiap/projects/zonamood/build_data2.RData')
+data2 = data
+setDT(data2)
+col_names_to_change <- names(data2)[4:length(names(data2))]
+new_col_names <- paste0(col_names_to_change, "2")
+setnames(data2, old = col_names_to_change, new = new_col_names)
+benestar_emocional2 = benestar_emocional
+familiar2 = familiar
+emocional2 = emocional
+social2 = social
+relacional_escolar2 = relacional_escolar
+load('/home/idiap/projects/zonamood/build_data.RData')
+data = data %>% select(-SEXE)
+# taula = left_join(data, data2, by='CODI')
+data <- data[CODI %in% data2$CODI] # GI72, GI80 i GI53 no van venir a la segona exploració
+data2 <- data2[CODI %in% data$CODI] # FA14, FA50, GI65 i GI82 no van venir a primera exploració
+data2 = data2 %>% select(-SEXE, -EDAT)
+taula = read_excel('~/idiap/data/zonamood/zonamood2/FINAL - EXPLOTACIO NUMERICA IDIAP - ERIC (1).xlsx', sheet = 7, col_names = TRUE)
+
+setDT(taula)
+taula <- taula[, suma := rowSums(.SD[, 4:49, with = FALSE])]
+taula = taula %>% mutate(resultat = ifelse(suma<=45, 'sense risc',
+                                         ifelse(suma>45 & suma<=70, 'lleu',
+                                                ifelse(suma>70 & suma<= 95, 'moderat', 'greu'))))
+taula$seguiment <- rep(c('seguiment1', 'seguiment2'), length.out = nrow(taula))
+```
+
+# Descriptives generals i per esfera
+
+```{r comprarar_resultats_totals, results='asis', warning=FALSE}
+taula$resultat <- factor(taula$resultat, levels = c('sense risc', "lleu", "moderat", 'greu'))
+ggplot(taula, aes(x = resultat, fill = seguiment)) +
+  geom_bar(stat = "count", position = "dodge") +
+  geom_text(aes(label = paste0(round((..count..)/sum(..count..) * 100, 1), "%")),
+            stat = "count", position = position_dodge(width = 1), vjust = -0.5, color = "black") +
+  # scale_y_continuous(labels = comma, expand = c(0, 8)) +
+  labs(title = "Distribution of Risks Total",
+       x = "risc",
+       y = "Count") +
+  scale_fill_manual(values = c('seguiment1' = "lightblue", 'seguiment2' = "lightcoral"))+
+  theme_minimal()
+```
+
+```{r esferes, warning=FALSE}
+benestar_emocional_tots = taula %>% select(1:13)
+emocional_tots = taula %>% select(1,2,3,14:22)
+social_tots = taula %>% select(1,2,3,23:28)
+familiar_tots = taula %>% select(1,2,3,29:31)
+relacional_escolar_tots = taula %>% select(1,2,3,32:49)
+
+benestar_emocional_tots <- benestar_emocional_tots[, suma := rowSums(.SD[, 4:13, with = FALSE])]
+benestar_emocional_tots = benestar_emocional_tots %>% mutate(resultat = ifelse(suma<=12, 'sense risc',
+                                                                     ifelse(suma>12 & suma<=18, 'lleu',
+                                                                            ifelse(suma>18 & suma<= 25, 'moderat', 'greu'))))
+benestar_emocional_tots$seguiment <- rep(c('seguiment1', 'seguiment2'), length.out = nrow(benestar_emocional_tots))
+
+emocional_tots <- emocional_tots[, suma := rowSums(.SD[, 4:12, with = FALSE])]
+emocional_tots = emocional_tots %>% mutate(resultat = ifelse(suma<=10, 'sense risc',
+                                                   ifelse(suma>10 & suma<=15, 'lleu',
+                                                          ifelse(suma>15 & suma<= 21, 'moderat', 'greu'))))
+emocional_tots$seguiment <- rep(c('seguiment1', 'seguiment2'), length.out = nrow(emocional_tots))
+
+social_tots <- social_tots[, suma := rowSums(.SD[, 4:9, with = FALSE])]
+social_tots = social_tots %>% mutate(resultat = ifelse(suma<=6, 'sense risc',
+                                             ifelse(suma>6 & suma<=9, 'lleu',
+                                                    ifelse(suma>9 & suma<= 12, 'moderat', 'greu'))))
+social_tots$seguiment <- rep(c('seguiment1', 'seguiment2'), length.out = nrow(social_tots))
+
+familiar_tots <- familiar_tots[, suma := rowSums(.SD[, 4:6, with = FALSE])]
+familiar_tots = familiar_tots %>% mutate(resultat = ifelse(suma<=3, 'sense risc',
+                                                 ifelse(suma>3 & suma<=5, 'lleu',
+                                                        ifelse(suma>5 & suma<= 7, 'moderat', 'greu'))))
+familiar_tots$seguiment <- rep(c('seguiment1', 'seguiment2'), length.out = nrow(familiar_tots))
+
+relacional_escolar_tots <- relacional_escolar_tots[, suma := rowSums(.SD[, 4:21, with = FALSE])]
+relacional_escolar_tots = relacional_escolar_tots %>% mutate(resultat = ifelse(suma<=14, 'sense risc',
+                                                                     ifelse(suma>14 & suma<=23, 'lleu',
+                                                                            ifelse(suma>23 & suma<= 30, 'moderat', 'greu'))))
+relacional_escolar_tots$seguiment <- rep(c('seguiment1', 'seguiment2'), length.out = nrow(relacional_escolar_tots))
+
+esferes = c('benestar_emocional_tots', 'emocional_tots', 'social_tots', 'familiar_tots', 'relacional_escolar_tots')
+```
+
+```{r grafic_esferes, results='asis', warning=FALSE}
+plot_function <- function(taula) {
+  taula$resultat <- factor(taula$resultat, levels = c('sense risc', "lleu", "moderat", 'greu'))
+  
+  ggplot(taula, aes(x = resultat, fill = seguiment)) +
+    geom_bar(stat = "count", position = "dodge") +
+    geom_text(aes(label = paste0(round((..count..)/sum(..count..) * 100, 1), "%")),
+              stat = "count", position = position_dodge(width = 1), vjust = -0.5, color = "black") +
+    labs(title = paste("Distribution of Risks -", esfera),
+         x = "risc",
+         y = "Count") +
+    scale_fill_manual(values = c('seguiment1' = "lightblue", 'seguiment2' = "lightcoral"))+
+    theme_minimal()
+}
+taula2 = taula
+# List to store the plots
+plots <- list()
+
+for (esfera in esferes) {
+  taula <- get(esfera)
+  plot <- plot_function(taula)
+  plots[[esfera]] <- plot
+}
+
+for (esfera in esferes) {
+  print(plots[[esfera]])
+}
+```
+# Comparativa General
+
+```{r piramide_poblacio, results='asis', warning=FALSE}
+library(XML)
+library(reshape2)
+library(plyr)
+taula = taula2
+dades = taula %>% select(-SEXE, -EDAT, -CODI, -suma, -resultat)
+melted_dades <- melt(dades, id.vars = "seguiment")
+result <- melted_dades %>% group_by(variable, seguiment) %>% summarize_if(is.numeric, sum, na.rm=TRUE)
+setnames(result, c("variable", "seguiment", "Sum"))
+
+
+# Create a basic bar chart for one gender
+basic_plot <-  ggplot(
+    result, 
+    aes(
+        x = variable, 
+        fill = seguiment, 
+        y = ifelse(
+            test = seguiment == "seguiment1", 
+            yes = -Sum, 
+            no = Sum
+            )
+        )
+    ) + 
+geom_bar(stat = "identity") 
+
+# Create population pyramids for both genders and combine them
+population_pyramid <- basic_plot +
+  scale_y_continuous(
+    labels = abs, 
+    limits = max(result$Sum) * c(-1,1)
+  ) + 
+  coord_flip() + 
+  theme_minimal() +
+  scale_fill_manual(values = c('seguiment1' = "lightblue", 'seguiment2' = "lightcoral"))+
+  labs(
+    x = "variable", 
+    y = "Sum", 
+    fill = "Seguiment", 
+    title = "Population Pyramid"
+  )
+population_pyramid
+```
+
+* Les següents variables presenten diferències significatives entre seguiments segons chi-squared test:
+
+```{r chi-test_seguiments}
+count_table <- taula %>% select(-CODI, -EDAT, -SEXE, -suma, -resultat)
+# Get the names of the categorical variables (excluding "SEXE")
+cat_vars <- names(count_table)[-47]
+
+# Perform chi-squared tests for each variable
+results <- lapply(cat_vars, function(var) {
+  contingency_table <- table(count_table$seguiment, count_table[[var]])
+  chisq.test(contingency_table)
+})
+# Extract the p-values from the chi-squared tests
+p_values <- sapply(results, function(res) res$p.value)
+
+# Identify statistically significant differences
+significant_vars <- cat_vars[p_values < 0.05]
+
+# Print the significant variables
+print(significant_vars)
+
+
+```
+
+# Comparativa Sexes
+
+## Homes
+
+```{r piramide_poblacio_homes, results='asis', warning=FALSE}
+library(XML)
+library(reshape2)
+library(plyr)
+taula = taula2
+taula_men = taula[SEXE=='Masculí']
+dades = taula_men %>% select(-SEXE, -EDAT, -CODI, -suma, -resultat)
+melted_dades <- melt(dades, id.vars = "seguiment")
+result <- melted_dades %>% group_by(variable, seguiment) %>% summarize_if(is.numeric, sum, na.rm=TRUE)
+setnames(result, c("variable", "seguiment", "Sum"))
+
+
+# Create a basic bar chart for one gender
+basic_plot <-  ggplot(
+    result, 
+    aes(
+        x = variable, 
+        fill = seguiment, 
+        y = ifelse(
+            test = seguiment == "seguiment1", 
+            yes = -Sum, 
+            no = Sum
+            )
+        )
+    ) + 
+geom_bar(stat = "identity") 
+
+# Create population pyramids for both genders and combine them
+population_pyramid <- basic_plot +
+  scale_y_continuous(
+    labels = abs, 
+    limits = max(result$Sum) * c(-1,1)
+  ) + 
+  coord_flip() + 
+  theme_minimal() +
+  scale_fill_manual(values = c('seguiment1' = "lightblue", 'seguiment2' = "lightcoral"))+
+  labs(
+    x = "variable", 
+    y = "Sum", 
+    fill = "Seguiment", 
+    title = "Population Pyramid"
+  )
+population_pyramid
+```
+
+* Les següents variables presenten diferències significatives entre seguiments en nois segons chi-squared test:
+
+```{r chi-test_seguiments_homes}
+count_table <- taula_men %>% select(-CODI, -EDAT, -SEXE, -suma, -resultat)
+# Get the names of the categorical variables (excluding "SEXE")
+cat_vars <- names(count_table)[-47]
+
+# Perform chi-squared tests for each variable
+results <- lapply(cat_vars, function(var) {
+  contingency_table <- table(count_table$seguiment, count_table[[var]])
+  chisq.test(contingency_table)
+})
+# Extract the p-values from the chi-squared tests
+p_values <- sapply(results, function(res) res$p.value)
+
+# Identify statistically significant differences
+significant_vars <- cat_vars[p_values < 0.05]
+
+# Print the significant variables
+print(significant_vars)
+
+
+```
+
+## Dones
+
+```{r piramide_poblacio_dones, results='asis', warning=FALSE}
+library(XML)
+library(reshape2)
+library(plyr)
+taula = taula2
+taula_wom = taula[SEXE=='Femení']
+dades = taula_wom %>% select(-SEXE, -EDAT, -CODI, -suma, -resultat)
+melted_dades <- melt(dades, id.vars = "seguiment")
+result <- melted_dades %>% group_by(variable, seguiment) %>% summarize_if(is.numeric, sum, na.rm=TRUE)
+setnames(result, c("variable", "seguiment", "Sum"))
+
+
+# Create a basic bar chart for one gender
+basic_plot <-  ggplot(
+    result, 
+    aes(
+        x = variable, 
+        fill = seguiment, 
+        y = ifelse(
+            test = seguiment == "seguiment1", 
+            yes = -Sum, 
+            no = Sum
+            )
+        )
+    ) + 
+geom_bar(stat = "identity") 
+
+# Create population pyramids for both genders and combine them
+population_pyramid <- basic_plot +
+  scale_y_continuous(
+    labels = abs, 
+    limits = max(result$Sum) * c(-1,1)
+  ) + 
+  coord_flip() + 
+  theme_minimal() +
+  scale_fill_manual(values = c('seguiment1' = "lightblue", 'seguiment2' = "lightcoral"))+
+  labs(
+    x = "variable", 
+    y = "Sum", 
+    fill = "Seguiment", 
+    title = "Population Pyramid"
+  )
+population_pyramid
+```
+
+* Les següents variables presenten diferències significatives entre seguiments en noies segons chi-squared test:
+
+```{r chi-test_seguiments_dones}
+count_table <- taula_wom %>% select(-CODI, -EDAT, -SEXE, -suma, -resultat)
+# Get the names of the categorical variables (excluding "SEXE")
+cat_vars <- names(count_table)[-47]
+
+# Perform chi-squared tests for each variable
+results <- lapply(cat_vars, function(var) {
+  contingency_table <- table(count_table$seguiment, count_table[[var]])
+  chisq.test(contingency_table)
+})
+# Extract the p-values from the chi-squared tests
+p_values <- sapply(results, function(res) res$p.value)
+
+# Identify statistically significant differences
+significant_vars <- cat_vars[p_values < 0.05]
+
+# Print the significant variables
+print(significant_vars)
+
+
+```
+
+# Comparativa Col·legis
+
+## Calella
+
+```{r piramide_poblacio_fa, results='asis', warning=FALSE}
+taula = taula2
+taula <- taula %>%
+  mutate(cole = ifelse(str_starts(CODI, "GI"), "St.Gregori", "Calella"))
+
+taula_FA = taula[cole=='Calella']
+dades = taula_FA %>% select(-SEXE, -EDAT, -CODI, -suma, -resultat, -cole)
+melted_dades <- melt(dades, id.vars = "seguiment")
+result <- melted_dades %>% group_by(variable, seguiment) %>% summarize_if(is.numeric, sum, na.rm=TRUE)
+setnames(result, c("variable", "seguiment", "Sum"))
+
+
+# Create a basic bar chart for one gender
+basic_plot <-  ggplot(
+    result, 
+    aes(
+        x = variable, 
+        fill = seguiment, 
+        y = ifelse(
+            test = seguiment == "seguiment1", 
+            yes = -Sum, 
+            no = Sum
+            )
+        )
+    ) + 
+geom_bar(stat = "identity") 
+
+# Create population pyramids for both genders and combine them
+population_pyramid <- basic_plot +
+  scale_y_continuous(
+    labels = abs, 
+    limits = max(result$Sum) * c(-1,1)
+  ) + 
+  coord_flip() + 
+  theme_minimal() +
+  scale_fill_manual(values = c('seguiment1' = "lightblue", 'seguiment2' = "lightcoral"))+
+  labs(
+    x = "variable", 
+    y = "Sum", 
+    fill = "Seguiment", 
+    title = "Population Pyramid"
+  )
+population_pyramid
+```
+
+* Les següents variables presenten diferències significatives entre seguiments alumnes de Calella segons chi-squared test:
+
+```{r chi-test_seguiments_fa}
+count_table <- taula_FA %>% select(-CODI, -EDAT, -SEXE, -suma, -resultat, -cole)
+# Get the names of the categorical variables (excluding "SEXE")
+cat_vars <- names(count_table)[-47]
+
+# Perform chi-squared tests for each variable
+results <- lapply(cat_vars, function(var) {
+  contingency_table <- table(count_table$seguiment, count_table[[var]])
+  chisq.test(contingency_table)
+})
+# Extract the p-values from the chi-squared tests
+p_values <- sapply(results, function(res) res$p.value)
+
+# Identify statistically significant differences
+significant_vars <- cat_vars[p_values < 0.05]
+
+# Print the significant variables
+print(significant_vars)
+
+
+```
+
+## Sant Gregori
+
+```{r piramide_poblacio_gregori, results='asis', warning=FALSE}
+taula = taula2
+taula <- taula %>%
+  mutate(cole = ifelse(str_starts(CODI, "GI"), "St.Gregori", "Calella"))
+
+taula_GI = taula[cole=='St.Gregori']
+dades = taula_GI %>% select(-SEXE, -EDAT, -CODI, -suma, -resultat, -cole)
+melted_dades <- melt(dades, id.vars = "seguiment")
+result <- melted_dades %>% group_by(variable, seguiment) %>% summarize_if(is.numeric, sum, na.rm=TRUE)
+setnames(result, c("variable", "seguiment", "Sum"))
+
+
+# Create a basic bar chart for one gender
+basic_plot <-  ggplot(
+    result, 
+    aes(
+        x = variable, 
+        fill = seguiment, 
+        y = ifelse(
+            test = seguiment == "seguiment1", 
+            yes = -Sum, 
+            no = Sum
+            )
+        )
+    ) + 
+geom_bar(stat = "identity") 
+
+# Create population pyramids for both genders and combine them
+population_pyramid <- basic_plot +
+  scale_y_continuous(
+    labels = abs, 
+    limits = max(result$Sum) * c(-1,1)
+  ) + 
+  coord_flip() + 
+  theme_minimal() +
+  scale_fill_manual(values = c('seguiment1' = "lightblue", 'seguiment2' = "lightcoral"))+
+  labs(
+    x = "variable", 
+    y = "Sum", 
+    fill = "Seguiment", 
+    title = "Population Pyramid"
+  )
+population_pyramid
+```
+
+* Les següents variables presenten diferències significatives entre seguiments en alumnes de St.Gregori segons chi-squared test:
+
+```{r chi-test_seguiments_gregori}
+count_table <- taula_GI %>% select(-CODI, -EDAT, -SEXE, -suma, -resultat, -cole)
+# Get the names of the categorical variables (excluding "SEXE")
+cat_vars <- names(count_table)[-47]
+
+# Perform chi-squared tests for each variable
+results <- lapply(cat_vars, function(var) {
+  contingency_table <- table(count_table$seguiment, count_table[[var]])
+  chisq.test(contingency_table)
+})
+# Extract the p-values from the chi-squared tests
+p_values <- sapply(results, function(res) res$p.value)
+
+# Identify statistically significant differences
+significant_vars <- cat_vars[p_values < 0.05]
+
+# Print the significant variables
+print(significant_vars)
+
+
+```
+
+# Esferes
+
+## Benestar emocional
+
+```{r piramide_poblacio_benestar_emocional, results='asis', warning=FALSE}
+taula = benestar_emocional_tots
+dades = taula %>% select(-SEXE, -EDAT, -CODI, -suma, -resultat)
+melted_dades <- melt(dades, id.vars = "seguiment")
+result <- melted_dades %>% group_by(variable, seguiment) %>% summarize_if(is.numeric, sum, na.rm=TRUE)
+setnames(result, c("variable", "seguiment", "Sum"))
+
+
+# Create a basic bar chart for one gender
+basic_plot <-  ggplot(
+    result, 
+    aes(
+        x = variable, 
+        fill = seguiment, 
+        y = ifelse(
+            test = seguiment == "seguiment1", 
+            yes = -Sum, 
+            no = Sum
+            )
+        )
+    ) + 
+geom_bar(stat = "identity") 
+
+# Create population pyramids for both genders and combine them
+population_pyramid <- basic_plot +
+  scale_y_continuous(
+    labels = abs, 
+    limits = max(result$Sum) * c(-1,1)
+  ) + 
+  coord_flip() + 
+  theme_minimal() +
+  scale_fill_manual(values = c('seguiment1' = "lightblue", 'seguiment2' = "lightcoral"))+
+  labs(
+    x = "variable", 
+    y = "Sum", 
+    fill = "Seguiment", 
+    title = "Benestar emocional"
+  )
+population_pyramid
+```
+
+## Emocional
+
+```{r piramide_poblacio_emocional, results='asis', warning=FALSE}
+taula = emocional_tots
+dades = taula %>% select(-SEXE, -EDAT, -CODI, -suma, -resultat)
+melted_dades <- melt(dades, id.vars = "seguiment")
+result <- melted_dades %>% group_by(variable, seguiment) %>% summarize_if(is.numeric, sum, na.rm=TRUE)
+setnames(result, c("variable", "seguiment", "Sum"))
+
+
+# Create a basic bar chart for one gender
+basic_plot <-  ggplot(
+    result, 
+    aes(
+        x = variable, 
+        fill = seguiment, 
+        y = ifelse(
+            test = seguiment == "seguiment1", 
+            yes = -Sum, 
+            no = Sum
+            )
+        )
+    ) + 
+geom_bar(stat = "identity") 
+
+# Create population pyramids for both genders and combine them
+population_pyramid <- basic_plot +
+  scale_y_continuous(
+    labels = abs, 
+    limits = max(result$Sum) * c(-1,1)
+  ) + 
+  coord_flip() + 
+  theme_minimal() +
+  scale_fill_manual(values = c('seguiment1' = "lightblue", 'seguiment2' = "lightcoral"))+
+  labs(
+    x = "variable", 
+    y = "Sum", 
+    fill = "Seguiment", 
+    title = "Emocional"
+  )
+population_pyramid
+```
+
+## Social
+
+```{r piramide_poblacio_social, results='asis', warning=FALSE}
+taula = social_tots
+dades = taula %>% select(-SEXE, -EDAT, -CODI, -suma, -resultat)
+melted_dades <- melt(dades, id.vars = "seguiment")
+result <- melted_dades %>% group_by(variable, seguiment) %>% summarize_if(is.numeric, sum, na.rm=TRUE)
+setnames(result, c("variable", "seguiment", "Sum"))
+
+
+# Create a basic bar chart for one gender
+basic_plot <-  ggplot(
+    result, 
+    aes(
+        x = variable, 
+        fill = seguiment, 
+        y = ifelse(
+            test = seguiment == "seguiment1", 
+            yes = -Sum, 
+            no = Sum
+            )
+        )
+    ) + 
+geom_bar(stat = "identity") 
+
+# Create population pyramids for both genders and combine them
+population_pyramid <- basic_plot +
+  scale_y_continuous(
+    labels = abs, 
+    limits = max(result$Sum) * c(-1,1)
+  ) + 
+  coord_flip() + 
+  theme_minimal() +
+  scale_fill_manual(values = c('seguiment1' = "lightblue", 'seguiment2' = "lightcoral"))+
+  labs(
+    x = "variable", 
+    y = "Sum", 
+    fill = "Seguiment", 
+    title = "Social"
+  )
+population_pyramid
+```
+
+## Familiar
+
+```{r piramide_poblacio_familiar, results='asis', warning=FALSE}
+taula = familiar_tots
+dades = taula %>% select(-SEXE, -EDAT, -CODI, -suma, -resultat)
+melted_dades <- melt(dades, id.vars = "seguiment")
+result <- melted_dades %>% group_by(variable, seguiment) %>% summarize_if(is.numeric, sum, na.rm=TRUE)
+setnames(result, c("variable", "seguiment", "Sum"))
+
+
+# Create a basic bar chart for one gender
+basic_plot <-  ggplot(
+    result, 
+    aes(
+        x = variable, 
+        fill = seguiment, 
+        y = ifelse(
+            test = seguiment == "seguiment1", 
+            yes = -Sum, 
+            no = Sum
+            )
+        )
+    ) + 
+geom_bar(stat = "identity") 
+
+# Create population pyramids for both genders and combine them
+population_pyramid <- basic_plot +
+  scale_y_continuous(
+    labels = abs, 
+    limits = max(result$Sum) * c(-1,1)
+  ) + 
+  coord_flip() + 
+  theme_minimal() +
+  scale_fill_manual(values = c('seguiment1' = "lightblue", 'seguiment2' = "lightcoral"))+
+  labs(
+    x = "variable", 
+    y = "Sum", 
+    fill = "Seguiment", 
+    title = "Familiar"
+  )
+population_pyramid
+```
+
+## Relacional escolar
+
+```{r piramide_poblacio_relacional_escolar, results='asis', warning=FALSE}
+taula = relacional_escolar_tots
+dades = taula %>% select(-SEXE, -EDAT, -CODI, -suma, -resultat)
+melted_dades <- melt(dades, id.vars = "seguiment")
+result <- melted_dades %>% group_by(variable, seguiment) %>% summarize_if(is.numeric, sum, na.rm=TRUE)
+setnames(result, c("variable", "seguiment", "Sum"))
+
+
+# Create a basic bar chart for one gender
+basic_plot <-  ggplot(
+    result, 
+    aes(
+        x = variable, 
+        fill = seguiment, 
+        y = ifelse(
+            test = seguiment == "seguiment1", 
+            yes = -Sum, 
+            no = Sum
+            )
+        )
+    ) + 
+geom_bar(stat = "identity") 
+
+# Create population pyramids for both genders and combine them
+population_pyramid <- basic_plot +
+  scale_y_continuous(
+    labels = abs, 
+    limits = max(result$Sum) * c(-1,1)
+  ) + 
+  coord_flip() + 
+  theme_minimal() +
+  scale_fill_manual(values = c('seguiment1' = "lightblue", 'seguiment2' = "lightcoral"))+
+  labs(
+    x = "variable", 
+    y = "Sum", 
+    fill = "Seguiment", 
+    title = "Relacional escolar"
+  )
+population_pyramid
+```

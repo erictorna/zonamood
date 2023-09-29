@@ -1,0 +1,437 @@
+---
+title: "Histogrames2"
+author: "ETN"
+date: "`r Sys.time()`"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+```{r libraries, include = FALSE}
+library(data.table)
+library(tidyverse)
+library(kableExtra)
+library(scales)
+load('/home/idiap/projects/zonamood/build_data2.RData')
+complete.cases(data)
+```
+
+# Total
+
+```{r total, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+data$resultat <- factor(data$resultat, levels = c('sense risc', "lleu", "moderat", 'greu'))
+ggplot(data, aes(x = resultat, fill = resultat)) +
+  geom_bar(stat = "count", position = "dodge") +
+  geom_text(aes(label = paste0(round((..count..)/sum(..count..) * 100, 1), "%")),
+            stat = "count", vjust = -0.5, color = "black") +
+  scale_y_continuous(labels = comma, expand = c(0, 8)) +
+  labs(title = "Distribution of Risks Total",
+       x = "risc",
+       y = "Count") +
+  theme_minimal()
+```
+
+```{r totalsuma, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+# Create a histogram using hist()
+hist(data$suma, breaks = 10, col = "steelblue", border = "white", xlab = "suma", ylab = "Frequency")
+
+# Add a vertical red line
+abline(v = 45, col = "red", lty = 2, lwd = 1)
+```
+
+
+# Benestar emocional
+
+```{r benestar, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+benestar_emocional$resultat <- factor(benestar_emocional$resultat, levels = c('sense risc', "lleu", "moderat", 'greu'))
+ggplot(benestar_emocional, aes(x = resultat, fill = resultat)) +
+  geom_bar(stat = "count", position = "dodge") +
+  geom_text(aes(label = paste0(round((..count..)/sum(..count..) * 100, 1), "%")),
+            stat = "count", vjust = -0.5, color = "black") +
+  scale_y_continuous(labels = comma, expand = c(0, 8)) +
+  labs(title = "Distribution of Risks Total",
+       x = "risc",
+       y = "Count") +
+  theme_minimal()
+```
+
+```{r benestarsuma, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+# Create a histogram using hist()
+hist(benestar_emocional$suma, breaks = 10, col = "steelblue", border = "white", xlab = "suma", ylab = "Frequency")
+
+# Add a vertical red line
+abline(v = 12, col = "red", lty = 2, lwd = 1)
+```
+
+# Emocional
+
+```{r emocional, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+emocional$resultat <- factor(emocional$resultat, levels = c('sense risc', "lleu", "moderat", 'greu'))
+ggplot(emocional, aes(x = resultat, fill = resultat)) +
+  geom_bar(stat = "count", position = "dodge") +
+  geom_text(aes(label = paste0(round((..count..)/sum(..count..) * 100, 1), "%")),
+            stat = "count", vjust = -0.5, color = "black") +
+  scale_y_continuous(labels = comma, expand = c(0, 8)) +
+  labs(title = "Distribution of Risks Total",
+       x = "risc",
+       y = "Count") +
+  theme_minimal()
+```
+
+```{r emocionalsuma, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+# Create a histogram using hist()
+hist(emocional$suma, breaks = 10, col = "steelblue", border = "white", xlab = "suma", ylab = "Frequency")
+
+# Add a vertical red line
+abline(v = 10, col = "red", lty = 2, lwd = 1)
+```
+
+# Social
+
+```{r social, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+social$resultat <- factor(social$resultat, levels = c('sense risc', "lleu", "moderat", 'greu'))
+ggplot(social, aes(x = resultat, fill = resultat)) +
+  geom_bar(stat = "count", position = "dodge") +
+  geom_text(aes(label = paste0(round((..count..)/sum(..count..) * 100, 1), "%")),
+            stat = "count", vjust = -0.5, color = "black") +
+  scale_y_continuous(labels = comma, expand = c(0, 8)) +
+  labs(title = "Distribution of Risks Total",
+       x = "risc",
+       y = "Count") +
+  theme_minimal()
+```
+
+```{r socialsuma, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+# Create a histogram using hist()
+hist(social$suma, breaks = 10, col = "steelblue", border = "white", xlab = "suma", ylab = "Frequency")
+
+# Add a vertical red line
+abline(v = 6, col = "red", lty = 2, lwd = 1)
+```
+
+# Familiar
+
+```{r familiar, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+familiar$resultat <- factor(familiar$resultat, levels = c('sense risc', "lleu", "moderat", 'greu'))
+ggplot(familiar, aes(x = resultat, fill = resultat)) +
+  geom_bar(stat = "count", position = "dodge") +
+  geom_text(aes(label = paste0(round((..count..)/sum(..count..) * 100, 1), "%")),
+            stat = "count", vjust = -0.5, color = "black") +
+  scale_y_continuous(labels = comma, expand = c(0, 8)) +
+  labs(title = "Distribution of Risks Total",
+       x = "risc",
+       y = "Count") +
+  theme_minimal()
+```
+
+```{r familiarsuma, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+# Create a histogram using hist()
+hist(familiar$suma, breaks = 10, col = "steelblue", border = "white", xlab = "suma", ylab = "Frequency")
+
+# Add a vertical red line
+abline(v = 3, col = "red", lty = 2, lwd = 1)
+```
+
+# Escolar
+
+```{r escolar, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+relacional_escolar$resultat <- factor(relacional_escolar$resultat, levels = c('sense risc', "lleu", "moderat", 'greu'))
+ggplot(relacional_escolar, aes(x = resultat, fill = resultat)) +
+  geom_bar(stat = "count", position = "dodge") +
+  geom_text(aes(label = paste0(round((..count..)/sum(..count..) * 100, 1), "%")),
+            stat = "count", vjust = -0.5, color = "black") +
+  scale_y_continuous(labels = comma, expand = c(0, 8)) +
+  labs(title = "Distribution of Risks Total",
+       x = "risc",
+       y = "Count") +
+  theme_minimal()
+```
+
+```{r escolarsuma, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+# Create a histogram using hist()
+hist(relacional_escolar$suma, breaks = 10, col = "steelblue", border = "white", xlab = "suma", ylab = "Frequency")
+
+# Add a vertical red line
+abline(v = 14, col = "red", lty = 2, lwd = 1)
+```
+
+
+# Total esferes + centinella
+
+
+```{r esferes, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+data$resultat_tot = data$resultat
+data = data %>% select(-suma, -resultat)
+benestar_emocional$resultat_benestar = benestar_emocional$resultat
+benestar_emocional = benestar_emocional %>% select(-suma, -resultat)
+emocional$resultat_emocional = emocional$resultat
+emocional = emocional %>% select(-suma, -resultat)
+familiar$resultat_familiar = familiar$resultat
+familiar = familiar %>% select(-suma, -resultat)
+relacional_escolar$resultat_escolar = relacional_escolar$resultat
+relacional_escolar = relacional_escolar %>% select(-suma, -resultat)
+social$resultat_social = social$resultat
+social = social %>% select(-suma, -resultat)
+
+tables <- list(data, benestar_emocional, emocional, familiar, relacional_escolar, social)
+esferes <- Reduce(left_join, tables)
+esferes = esferes %>% mutate(risc = ifelse(resultat_tot!='sense risc' | resultat_benestar!='sense risc' | resultat_emocional!='sense risc' | resultat_familiar!='sense risc' | resultat_escolar!='sense risc' | resultat_social!='sense risc' | sol>=3 | social>=3 | no_grup_amics>=3 | casa_bien>=3 | actuar_davant_abus>=3, 'risc', 'no_risc'))
+save(esferes, file='~/idiap/projects/zonamood/esferes.RData')
+```
+
+```{r histo_esferes, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+esferes$risc <- factor(esferes$risc, levels = c('risc', "no_risc"))
+ggplot(esferes, aes(x = risc, fill = risc)) +
+  geom_bar(stat = "count", position = "dodge") +
+  geom_text(aes(label = paste0((..count..), '(',round((..count..)/sum(..count..) * 100, 1), "%", ')')),
+            stat = "count", vjust = -0.5, color = "black") +
+  scale_y_continuous(labels = comma, expand = c(0, 8)) +
+  labs(title = "Distribution of Risks Total",
+       x = "",
+       y = "Count") +
+  theme_minimal()
+```
+
+```{r histo_esferes_sexe, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+category_data <- esferes[, .(Count = .N), by = .(risc, SEXE)]
+category_data[, Percentage := Count / sum(Count) * 100, by = risc]
+
+ggplot(category_data, aes(x = risc, y = Count, fill = SEXE)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  geom_text(aes(label = paste0(Count, '(', round(Percentage, 1), "%", ')')),
+            position = position_dodge(width = 1), vjust = -0.5, color = "black") +
+  labs(title = "Distribution of Risk by gender",
+       x = "", y = "Count") +
+  theme_minimal()
+
+cont_table <- esferes %>%
+  count(SEXE, risc) %>%
+  pivot_wider(names_from = risc, values_from = n, values_fill = 0)
+
+# Perform the chi-square test
+chi_square_result <- chisq.test(cont_table[, -1])
+p_valor = chi_square_result$p.value
+```
+
+* No observem diferències significatives entre sexes, p-valor = `r p_valor`
+
+```{r histo_esferes_coles, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+esferes <- esferes %>%
+  mutate(cole = ifelse(str_starts(CODI, "GI"), "St.Gregori", "Calella"))
+
+category_data <- esferes[, .(Count = .N), by = .(risc, cole)]
+category_data[, Percentage := Count / sum(Count) * 100, by = risc]
+
+ggplot(category_data, aes(x = risc, y = Count, fill = cole)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  geom_text(aes(label = paste0(Count, '(', round(Percentage, 1), "%", ')')),
+            position = position_dodge(width = 1), vjust = -0.5, color = "black") +
+  labs(title = "Distribution of Risk by School",
+       x = "", y = "Count") +
+  theme_minimal()
+
+cont_table <- esferes %>%
+  count(cole, risc) %>%
+  pivot_wider(names_from = risc, values_from = n, values_fill = 0)
+
+# Perform the chi-square test
+chi_square_result <- chisq.test(cont_table[, -1])
+p_valor = chi_square_result$p.value
+```
+
+* No observem diferències significatives entre col·legis, p-valor = `r p_valor`
+
+# Gràfica preguntes
+
+```{r histogrames_variables, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.width=10, fig.height=5}
+numerical_vars <- names(data)[sapply(data, is.numeric)]
+numerical_vars = numerical_vars[-1]
+sums <- colSums(data[, ..numerical_vars])
+
+# Create a data frame with variable names and sums
+sum_df <- data.frame(variable = names(sums), sum = sums)
+
+# Set the levels of the 'variable' column in the original order
+sum_df$variable <- factor(sum_df$variable, levels = names(data))
+
+# Create a new column for color groups
+sum_df$esfera <- cut(
+  as.numeric(sum_df$variable),
+  breaks = c(0, 12, 24, 33, 39, Inf),
+  labels = c("Benestar emocional", "emocional", "social", "familiar", "escolar")
+)
+
+# Create a bar plot with different colors for each group
+plot <- ggplot(sum_df, aes(x = variable, y = sum, fill = esfera)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Total Sum of Variables", x = "Variables", y = "Sum") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+  scale_fill_manual(
+    values = c("Benestar emocional" = "steelblue", "emocional" = "darkorange",
+               "social" = "green", "familiar" = "purple", "escolar" = "red")
+  )
+
+# Display the plot
+plot
+
+```
+
+## Per sexe
+
+```{r hostogrames_variables_genere, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.width=10, fig.height=5}
+males = data[SEXE=='Masculí']
+females = data[SEXE=='Femení']
+
+# Plot the first histogram with normal distribution
+numerical_vars <- names(males)[sapply(males, is.numeric)]
+numerical_vars = numerical_vars[-1]
+sums <- colSums(males[, ..numerical_vars])
+sum_df <- data.frame(variable = names(sums), sum = sums)
+sum_df$variable <- factor(sum_df$variable, levels = names(data))
+sum_df$esfera <- cut(
+  as.numeric(sum_df$variable),
+  breaks = c(0, 12, 24, 33, 39, Inf),
+  labels = c("Benestar emocional", "emocional", "social", "familiar", "escolar")
+)
+ggplot(sum_df, aes(x = variable, y = sum, fill = esfera)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Homes", x = "Variables", y = "Sum") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+  scale_fill_manual(
+    values = c("Benestar emocional" = "steelblue", "emocional" = "darkorange",
+               "social" = "green", "familiar" = "purple", "escolar" = "red")
+  )+
+  ylim(0, 80)
+
+# Plot the second histogram with normal distribution
+numerical_vars <- names(females)[sapply(females, is.numeric)]
+numerical_vars = numerical_vars[-1]
+sums <- colSums(females[, ..numerical_vars])
+sum_df <- data.frame(variable = names(sums), sum = sums)
+sum_df$variable <- factor(sum_df$variable, levels = names(data))
+sum_df$esfera <- cut(
+  as.numeric(sum_df$variable),
+  breaks = c(0, 12, 24, 33, 39, Inf),
+  labels = c("Benestar emocional", "emocional", "social", "familiar", "escolar")
+)
+ggplot(sum_df, aes(x = variable, y = sum, fill = esfera)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Dones", x = "Variables", y = "Sum") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+  scale_fill_manual(
+    values = c("Benestar emocional" = "steelblue", "emocional" = "darkorange",
+               "social" = "green", "familiar" = "purple", "escolar" = "red")
+  )+
+  ylim(0, 80)
+
+```
+
+* Les següents variables presenten diferències significatives entre sexes segons chi-squared test:
+
+```{r chi-test_sexe}
+count_table <- data %>% select(-CODI, -resultat_tot)
+count_table = count_table[SEXE!='Altres']
+# Get the names of the categorical variables (excluding "SEXE")
+cat_vars <- names(count_table)[-1]
+
+# Perform chi-squared tests for each variable
+results <- lapply(cat_vars, function(var) {
+  contingency_table <- table(count_table$SEXE, count_table[[var]])
+  chisq.test(contingency_table)
+})
+# Extract the p-values from the chi-squared tests
+p_values <- sapply(results, function(res) res$p.value)
+
+# Identify statistically significant differences
+significant_vars <- cat_vars[p_values < 0.05]
+
+# Print the significant variables
+print(significant_vars)
+
+
+```
+
+## Per col·legi
+
+```{r hostogrames_variables_coles, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.width=10, fig.height=5}
+data = esferes %>% select(-CODI, -SEXE, -resultat_tot, -resultat_benestar, -resultat_emocional, -resultat_familiar, -resultat_escolar, -resultat_social, -risc)
+calella = data[cole=='Calella']
+gregori = esferes[cole=='St.Gregori']
+
+# Plot the first histogram with normal distribution
+numerical_vars <- names(calella)[sapply(calella, is.numeric)]
+numerical_vars = numerical_vars[-1]
+sums <- colSums(calella[, ..numerical_vars])
+sum_df <- data.frame(variable = names(sums), sum = sums)
+sum_df$variable <- factor(sum_df$variable, levels = names(data))
+sum_df$esfera <- cut(
+  as.numeric(sum_df$variable),
+  breaks = c(0, 10, 22, 31, 37, Inf),
+  labels = c("Benestar emocional", "emocional", "social", "familiar", "escolar")
+)
+ggplot(sum_df, aes(x = variable, y = sum, fill = esfera)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Calella", x = "Variables", y = "Sum") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+  scale_fill_manual(
+    values = c("Benestar emocional" = "steelblue", "emocional" = "darkorange",
+               "social" = "green", "familiar" = "purple", "escolar" = "red")
+  )+
+  ylim(0, 80)
+
+# Plot the second histogram with normal distribution
+numerical_vars <- names(gregori)[sapply(gregori, is.numeric)]
+numerical_vars = numerical_vars[-1]
+sums <- colSums(gregori[, ..numerical_vars])
+sum_df <- data.frame(variable = names(sums), sum = sums)
+sum_df$variable <- factor(sum_df$variable, levels = names(data))
+sum_df$esfera <- cut(
+  as.numeric(sum_df$variable),
+  breaks = c(0, 10, 22, 31, 37, Inf),
+  labels = c("Benestar emocional", "emocional", "social", "familiar", "escolar")
+)
+ggplot(sum_df, aes(x = variable, y = sum, fill = esfera)) +
+  geom_bar(stat = "identity") +
+  labs(title = "St.Gregori", x = "Variables", y = "Sum") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+  scale_fill_manual(
+    values = c("Benestar emocional" = "steelblue", "emocional" = "darkorange",
+               "social" = "green", "familiar" = "purple", "escolar" = "red")
+  )+
+  ylim(0, 80)
+
+```
+
+* Les següents variables presenten diferències significatives entre col·legis segons chi-squared test:
+
+```{r chi-test_cole}
+count_table <- data 
+count_table$EDAT<-NULL
+# Get the names of the categorical variables (excluding "SEXE")
+cat_vars <- names(count_table)[-47]
+
+# Perform chi-squared tests for each variable
+results <- lapply(cat_vars, function(var) {
+  contingency_table <- table(count_table$cole, count_table[[var]])
+  chisq.test(contingency_table)
+})
+# Extract the p-values from the chi-squared tests
+p_values <- sapply(results, function(res) res$p.value)
+
+# Identify statistically significant differences
+significant_vars <- cat_vars[p_values < 0.05]
+
+# Print the significant variables
+print(significant_vars)
+
+
+```
