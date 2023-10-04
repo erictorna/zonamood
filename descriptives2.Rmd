@@ -185,7 +185,7 @@ social = social %>% select(-suma, -resultat)
 tables <- list(data, benestar_emocional, emocional, familiar, relacional_escolar, social)
 esferes <- Reduce(left_join, tables)
 esferes = esferes %>% mutate(risc = ifelse(resultat_tot!='sense risc' | resultat_benestar!='sense risc' | resultat_emocional!='sense risc' | resultat_familiar!='sense risc' | resultat_escolar!='sense risc' | resultat_social!='sense risc' | sol>=3 | social>=3 | no_grup_amics>=3 | casa_bien>=3 | actuar_davant_abus>=3, 'risc', 'no_risc'))
-save(esferes, file='~/idiap/projects/zonamood/esferes.RData')
+save(esferes, file='~/idiap/projects/zonamood/esferes2.RData')
 ```
 
 ```{r histo_esferes, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
@@ -214,7 +214,7 @@ ggplot(category_data, aes(x = risc, y = Count, fill = SEXE)) +
   theme_minimal()
 
 cont_table <- esferes %>%
-  count(SEXE, risc) %>%
+  dplyr::count(SEXE, risc) %>%
   pivot_wider(names_from = risc, values_from = n, values_fill = 0)
 
 # Perform the chi-square test
@@ -240,7 +240,7 @@ ggplot(category_data, aes(x = risc, y = Count, fill = cole)) +
   theme_minimal()
 
 cont_table <- esferes %>%
-  count(cole, risc) %>%
+  dplyr::count(cole, risc) %>%
   pivot_wider(names_from = risc, values_from = n, values_fill = 0)
 
 # Perform the chi-square test
@@ -335,6 +335,51 @@ ggplot(sum_df, aes(x = variable, y = sum, fill = esfera)) +
 
 ```
 
+### Piramide
+
+```{r piramide_poblacio_sexe, results='asis', warning=FALSE}
+taula = data %>% select(-EDAT, -CODI, -resultat_tot)
+taula = taula[SEXE!='Altres']
+# dades = taula %>% select(-cole)
+melted_dades <- melt(taula, id.vars = "SEXE")
+result <- melted_dades %>% group_by(variable, SEXE) %>% summarize_if(is.numeric, sum, na.rm=TRUE)
+setnames(result, c("variable", "sexe", "Sum"))
+
+
+# Create a basic bar chart for one gender
+basic_plot <-  ggplot(
+    result, 
+    aes(
+        x = variable, 
+        fill = sexe, 
+        y = ifelse(
+            test = sexe == "Masculí", 
+            yes = -Sum, 
+            no = Sum
+            )
+        )
+    ) + 
+geom_bar(stat = "identity") 
+
+# Create population pyramids for both genders and combine them
+population_pyramid <- basic_plot +
+  scale_y_continuous(
+    labels = abs, 
+    limits = max(result$Sum) * c(-1,1)
+  ) + 
+  coord_flip() + 
+  theme_minimal() +
+  scale_fill_manual(values = c('Masculí' = "lightblue", 'Femení' = "lightcoral"))+
+  labs(
+    x = "variable", 
+    y = "Sum", 
+    fill = "sexe", 
+    title = "Population Pyramid"
+  )
+population_pyramid
+```
+
+
 * Les següents variables presenten diferències significatives entre sexes segons chi-squared test:
 
 ```{r chi-test_sexe}
@@ -409,6 +454,49 @@ ggplot(sum_df, aes(x = variable, y = sum, fill = esfera)) +
   )+
   ylim(0, 80)
 
+```
+
+### Piramide
+
+```{r piramide_poblacio_colegis, results='asis', warning=FALSE}
+taula = data %>% select(-EDAT)
+# dades = taula %>% select(-cole)
+melted_dades <- melt(taula, id.vars = "cole")
+result <- melted_dades %>% group_by(variable, cole) %>% summarize_if(is.numeric, sum, na.rm=TRUE)
+setnames(result, c("variable", "cole", "Sum"))
+
+
+# Create a basic bar chart for one gender
+basic_plot <-  ggplot(
+    result, 
+    aes(
+        x = variable, 
+        fill = cole, 
+        y = ifelse(
+            test = cole == "Calella", 
+            yes = -Sum, 
+            no = Sum
+            )
+        )
+    ) + 
+geom_bar(stat = "identity") 
+
+# Create population pyramids for both genders and combine them
+population_pyramid <- basic_plot +
+  scale_y_continuous(
+    labels = abs, 
+    limits = max(result$Sum) * c(-1,1)
+  ) + 
+  coord_flip() + 
+  theme_minimal() +
+  scale_fill_manual(values = c('Calella' = "lightblue", 'St.Gregori' = "lightcoral"))+
+  labs(
+    x = "variable", 
+    y = "Sum", 
+    fill = "cole", 
+    title = "Population Pyramid"
+  )
+population_pyramid
 ```
 
 * Les següents variables presenten diferències significatives entre col·legis segons chi-squared test:

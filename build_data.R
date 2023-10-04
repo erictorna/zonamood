@@ -7,11 +7,11 @@ data = read_excel('~/idiap/data/zonamood/results-survey26.04.2023_DEFINITIU.xlsx
 # Canviem els valors de 'valorat' ja que hi ha un error en en l'excel i estan les dades al revés
 data = data %>% mutate(valorat=ifelse(valorat==2, 0, 2))
 setDT(data)
-benestar_emocional = data %>% select(1:10)
-emocional = data %>% select(1,2,11:19)
-social = data %>% select(1,2,20:25)
-familiar = data %>% select(1,2,26:28)
-relacional_escolar = data %>% select(1,2,29:48)
+benestar_emocional = data %>% select(1:12)
+emocional = data %>% select(1,2,13:21)
+social = data %>% select(1,2,22:27)
+familiar = data %>% select(1,2,28:30)
+relacional_escolar = data %>% select(1,2,31:48)
 
 
 data <- data[, suma := rowSums(.SD[, 3:48, with = FALSE])]
@@ -38,7 +38,7 @@ familiar = familiar %>% mutate(resultat = ifelse(suma<=3, 'sense risc',
                                                  ifelse(suma>3 & suma<=5, 'lleu',
                                                         ifelse(suma>5 & suma<= 7, 'moderat', 'greu'))))
 
-relacional_escolar <- relacional_escolar[, suma := rowSums(.SD[, 3:22, with = FALSE])]
+relacional_escolar <- relacional_escolar[, suma := rowSums(.SD[, 3:20, with = FALSE])]
 relacional_escolar = relacional_escolar %>% mutate(resultat = ifelse(suma<=14, 'sense risc',
                                                                      ifelse(suma>14 & suma<=23, 'lleu',
                                                                             ifelse(suma>23 & suma<= 30, 'moderat', 'greu'))))

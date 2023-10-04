@@ -9,6 +9,10 @@ output:
 
 * Descriptives[[html]](descriptives.html)
 
+* Descriptives segon seguiment[[html]](descriptives2.html)
+
+* Comparativa seguiments[[html]](comparativa.html)
+
 ```{r, echo=FALSE, include=FALSE}
 library(data.table)
 library(kableExtra)
@@ -18,7 +22,22 @@ setDT(alumnes_avaluar)
 alumnes = alumnes_avaluar[avaluar==1] %>% select(-avaluar)
 ```
 
-* Alumnes que presenten almenys la màxima puntuació en alguna de les preguntes centinella o <br> tenen pregntes centinella alterades + una puntuació d'almenys 'lleu' a qualsevol esfera
+* Alumnes que presenten almenys la màxima puntuació en alguna de les preguntes centinella o <br> tenen preguntes centinella alterades + una puntuació d'almenys 'lleu' a qualsevol esfera
+
+# Primer seguiment
+
+```{r, echo=FALSE}
+kable_styling(kable(alumnes))
+```
+
+```{r, echo=FALSE, include=FALSE}
+load('~/idiap/projects/zonamood/alumnes_avaluar2.RData')
+setDT(alumnes_avaluar)
+alumnes = alumnes_avaluar[avaluar==1] %>% select(-avaluar)
+```
+
+# Segon seguiment
+
 
 ```{r, echo=FALSE}
 kable_styling(kable(alumnes))
